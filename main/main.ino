@@ -40,13 +40,14 @@ int i = 0;
 int step = 0;
 int menu = 0;
 bool started = 0;
+unsigned long lastTimeMonitor = 0;
 
 void loop() {
   digitalWrite(A0, 1);
   // put your main code here, to run repeatedly:
 
   //Serial.println();
- /* TimeCountdown(&TimeD);
+  /* TimeCountdown(&TimeD);
   Serial.print("T: ");
   Serial.print(TimeD.Hour);
   Serial.print(":");
@@ -97,38 +98,44 @@ void loop() {
       if (i == 2) {
         if (step > 0) {
           TimeIncrement(&TimeW);
-          UI_Change_Time(&TimeW,0);
+          UI_Change_Time(&TimeW, 0);
         }
         if (step < 0) {
           TimeDecrement(&TimeW);
-          UI_Change_Time(&TimeW,0);
+          UI_Change_Time(&TimeW, 0);
         }
       }
 
       if (i == 3) {
         if (step > 0) {
           TimeIncrement(&TimeD);
-          UI_Change_Time(&TimeD,1);
+          UI_Change_Time(&TimeD, 1);
         }
         if (step < 0) {
           TimeDecrement(&TimeD);
-          UI_Change_Time(&TimeD,1);
+          UI_Change_Time(&TimeD, 1);
         }
       }
     }
   }
 
-  if(!Button_Check(buttonPin))
-  {
+  if (!Button_Check(buttonPin)) {
     started = 1;
-    TimeW.Enable = false;
+    TimeW.Enable = true;
   }
 
-  if(started)
-  {
+  if (started) {
     TimeCountdown(&TimeW);
-    UI_Change_Time(&TimeW,0);
+    if (millis() - lastTimeMonitor > 1000) {
+      Serial.print("T: ");
+      Serial.print(TimeW.Hour);
+      Serial.print(":");
+      Serial.print(TimeW.Minute);
+      Serial.print(":");
+      Serial.print(TimeW.Second);
+      Serial.println();
+      lastTimeMonitor = millis();
+      UI_Change_Time(&TimeW, 0);
+    }
   }
-
-  
 }

@@ -1,7 +1,7 @@
 
 int A, B, C, Step;
 
-unsigned int Enc_Time_Check = 0;
+unsigned long Enc_Time_Check = 0;
 
 void Encoder_Init(int pinA, int pinB, int pinC) {
 

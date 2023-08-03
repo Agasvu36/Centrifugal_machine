@@ -7,7 +7,7 @@ struct Time {
 
 
 
-unsigned long int timer_millis = 0;
+unsigned long timer_millis = 0;
 
 void TimeCountdown(struct Time *t) {
 

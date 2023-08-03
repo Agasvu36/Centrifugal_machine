@@ -1,4 +1,4 @@
-unsigned int Button_Time_Check = 0;
+unsigned Button_Time_Check = 0;
 
 int Button_Check(int Pin) {
   if(millis() - Button_Time_Check > 150)
