@@ -1,41 +1,134 @@
+
 #include "UI.h"
 #include "Encoder.h"
+#include "Button.h"
+
+
+
+int VelosityW, VelosityD = 20;
+
+int *params[] = { &VelosityW, &VelosityD };
+
+struct Time TimeW = { 00, 00, 59, false };
+struct Time TimeD = { 00, 00, 59, false };
+int buttonPin = 2;
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(9600);
-    
-  pinMode(5, INPUT);
-  pinMode(6, INPUT);
-  pinMode(7, INPUT);
 
+  pinMode(5, INPUT);
+  pinMode(6, INPUT_PULLUP);
+  pinMode(7, INPUT);
+  pinMode(buttonPin, INPUT_PULLUP);
   pinMode(A0, OUTPUT);
 
   Encoder_Init(5, 7, 6);
 
   UI_Init();
   UI_Create();
+
+  TimeW.Hour = 2;
+  TimeW.Minute = 59;
+  TimeW.Second = 59;
+  //TimeW.Enable = false;
+  //TimeD.Enable = true;
 }
 
 
 
 int i = 0;
+int step = 0;
+int menu = 0;
+bool started = 0;
+
 void loop() {
   digitalWrite(A0, 1);
   // put your main code here, to run repeatedly:
-  i += Encoder_Check()*10;
-  Serial.print(digitalRead(5));
-  Serial.print(',');
-  Serial.print(digitalRead(6));
-  Serial.print(',');
- // Serial.print(i);
-//  Serial.print(',');
-  Serial.println(digitalRead(7));
 
-  UI_Change_Velosity(i, 0);
-  //UI_Change_Velosity(i, 1);
-  //if (i >= 1000)
-   // i = 0;
-  //delay(25);
-  //Serial.println(digitalRead(14));
+  //Serial.println();
+ /* TimeCountdown(&TimeD);
+  Serial.print("T: ");
+  Serial.print(TimeD.Hour);
+  Serial.print(":");
+  Serial.print(TimeD.Minute);
+  Serial.print(":");
+  Serial.print(TimeD.Second);
+  Serial.println();*/
+
+  step = Encoder_Check();
+
+  if (!Encoder_Button_Check()) {
+    ++menu;
+
+    if (menu > 1)
+      menu = 0;
   }
+
+  if (menu == 0) {
+    if (step != 0) {
+      i += step;
+      if (i > 3)
+        i = 0;
+      if (i < 0)
+        i = 3;
+
+      if (i == 0)
+        UI_Draw_Vector(3, 0);
+      if (i == 1)
+        UI_Draw_Vector(3, 1);
+      if (i == 2)
+        UI_Draw_Vector(10, 0);
+      if (i == 3)
+        UI_Draw_Vector(10, 1);
+      Serial.println(i);
+    }
+  }
+
+  if (menu == 1) {
+    if (step != 0) {
+      if (i < 2) {
+        *params[i] += step * 10;
+        if (*params[i] < 0)
+          *params[i] = 1000;
+        if (*params[i] > 1000)
+          *params[i] = 0;
+        UI_Change_Velosity(*params[i], i);
+      }
+      if (i == 2) {
+        if (step > 0) {
+          TimeIncrement(&TimeW);
+          UI_Change_Time(&TimeW,0);
+        }
+        if (step < 0) {
+          TimeDecrement(&TimeW);
+          UI_Change_Time(&TimeW,0);
+        }
+      }
+
+      if (i == 3) {
+        if (step > 0) {
+          TimeIncrement(&TimeD);
+          UI_Change_Time(&TimeD,1);
+        }
+        if (step < 0) {
+          TimeDecrement(&TimeD);
+          UI_Change_Time(&TimeD,1);
+        }
+      }
+    }
+  }
+
+  if(!Button_Check(buttonPin))
+  {
+    started = 1;
+    TimeW.Enable = false;
+  }
+
+  if(started)
+  {
+    TimeCountdown(&TimeW);
+    UI_Change_Time(&TimeW,0);
+  }
+
+  
+}

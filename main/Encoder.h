@@ -1,6 +1,8 @@
 
 int A, B, C, Step;
 
+unsigned int Enc_Time_Check = 0;
+
 void Encoder_Init(int pinA, int pinB, int pinC) {
 
   A = pinA;
@@ -10,33 +12,29 @@ void Encoder_Init(int pinA, int pinB, int pinC) {
 
 bool Checked = 0;
 int Encoder_Check() {
-  if (digitalRead(A) == 1 && digitalRead(C) == 1) { 
-    Checked = 0; 
+  if (digitalRead(A) == 1 && digitalRead(C) == 1) {
+    Checked = 0;
   }
   if (!Checked) {
     if (digitalRead(A) < digitalRead(C)) {
       Checked = 1;
       return 1;
-
     }
     if (digitalRead(A) > digitalRead(C)) {
       Checked = 1;
       return -1;
-
     }
   }
   return 0;
 }
 
-unsigned int time = 0;
 int Encoder_Button_Check() {
-  time = millis();
-  if(digitalRead(B) == 0 && time > 100)
+  if(millis() - Enc_Time_Check > 150)
   {
-    return 0;
+    Enc_Time_Check = millis();
+    return digitalRead(B);
   }
-  else
-  {
-    return 1;
-  }
+  else{
+    return -1;
+  }  
 }
