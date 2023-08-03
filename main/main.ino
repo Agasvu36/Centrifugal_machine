@@ -5,12 +5,12 @@
 
 
 
-int VelosityW, VelosityD = 20;
+int VelosityW, VelosityD = 50;
 
 int *params[] = { &VelosityW, &VelosityD };
 
-struct Time TimeW = { 00, 00, 59, false };
-struct Time TimeD = { 00, 00, 59, false };
+struct Time TimeW = { 2, 30, 00, false };
+struct Time TimeD = { 2, 30, 00, false };
 int buttonPin = 2;
 
 void setup() {
@@ -27,9 +27,18 @@ void setup() {
   UI_Init();
   UI_Create();
 
-  TimeW.Hour = 2;
-  TimeW.Minute = 59;
-  TimeW.Second = 59;
+  UI_Draw_Vector(3, 0);
+  
+  UI_Change_Velosity(VelosityW, 0);
+  UI_Change_Velosity(VelosityW, 1);
+
+  TimeIncrement(&TimeW);
+  UI_Change_Time(&TimeW, 0);
+
+
+  TimeIncrement(&TimeD);
+  UI_Change_Time(&TimeD, 1);
+
   //TimeW.Enable = false;
   //TimeD.Enable = true;
 }

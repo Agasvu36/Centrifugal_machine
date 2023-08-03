@@ -23,6 +23,7 @@ void TimeCountdown(struct Time *t) {
       }
 
       if ((*t).Minute < 0) {
+        (*t).Minute = 59;
         (*t).Hour--;
       }
 
